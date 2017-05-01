@@ -191,7 +191,6 @@ public class GUIWindow  extends JFrame{
 		
 		boolean success = true;
 		
-		
 		String name = nameField.getText();
 		if(name.length() == 0){
 			success = false;
