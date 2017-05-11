@@ -11,12 +11,12 @@ import java.text.*;
 
 public class GUIWindow  extends JFrame{
 	
-	private boolean onEmpoyees = true;
+	private boolean onEmployees = true;
 	private boolean addingPerson = true;
 	
-	private int lastScheduleIndex = 0;
-	private int currentScheduleIndex = 0;
-	private int lastPersonIndex = 0;
+	private int lastScheduleIndex = -1;
+	private int currentScheduleIndex = -1;
+	private int lastPersonIndex = -1;
 	private int currentPersonIndex = -1;
 	
 	private Manager m = new Manager();
@@ -156,7 +156,7 @@ public class GUIWindow  extends JFrame{
 		addPersonButton.setText("save");
 		nameField.setText("");
 		payField.setText("");
-		if(!onEmpoyees){
+		if(!onEmployees){
 			payField.setText("");
 		}
 		
@@ -199,7 +199,7 @@ public class GUIWindow  extends JFrame{
 			JOptionPane.showMessageDialog(null,"Please enter a name.","Incorrect Input",JOptionPane.WARNING_MESSAGE);
 		}
 		double pay = 0;
-		if(onEmpoyees){
+		if(onEmployees){
 			try{
 				pay = Double.parseDouble(payField.getText());
 			}
@@ -210,7 +210,7 @@ public class GUIWindow  extends JFrame{
 		}
 		
 		if(success){
-			if(onEmpoyees){
+			if(onEmployees){
 				m.addEmployee(new Employee(pay,name));
 			}
 			else{
@@ -219,7 +219,10 @@ public class GUIWindow  extends JFrame{
 			
 			nameField.addActionListener(new nameListener());
 			payField.addActionListener(new payListener());
-			payField.setEnabled(true);
+			
+			if(onEmployees){
+				payField.setEnabled(true);
+			}
 			
 			addingPerson = false;
 			lastPersonIndex++;
@@ -283,7 +286,7 @@ public class GUIWindow  extends JFrame{
 				success = false;
 				JOptionPane.showMessageDialog(null,"End min field: please only enter a number from 0-59","Incorrect Input",JOptionPane.WARNING_MESSAGE);
 			}
-			if(startHour > endHour || ((startHour == endHour) && endMin > startMin)){
+			if((startHour * 100 + startMin) > (endHour * 100 + endMin)){
 				success = false;
 				JOptionPane.showMessageDialog(null,"Please enter a end time after start time","Incorrect Input",JOptionPane.WARNING_MESSAGE);
 			}
@@ -292,7 +295,7 @@ public class GUIWindow  extends JFrame{
 				JOptionPane.showMessageDialog(null,"Day field: please only enter a number from 1-7","Incorrect Input",JOptionPane.WARNING_MESSAGE);
 			}
 			if(success){
-				if(onEmpoyees == true){
+				if(onEmployees == true){
 					m.getEmployee(currentPersonIndex).addDateTime(new DateTime(startHour, startMin, endHour, endMin, day));
 				}
 				else{
@@ -306,50 +309,91 @@ public class GUIWindow  extends JFrame{
 	}
 	
 	private void setUpInfo(){
-		if(onEmpoyees){
+		if(onEmployees){
 			nameField.setText(m.getEmployee(currentPersonIndex).getName());
 			payField.setEnabled(true);
 			payField.setText(m.getEmployee(currentPersonIndex).getPay() + "");
 			lastScheduleIndex = m.getEmployee(currentPersonIndex).getScheduleLength() - 1;
-			if(currentScheduleIndex <= lastScheduleIndex){
+			if(currentScheduleIndex <= lastScheduleIndex && currentScheduleIndex != -1){
 				scheduleField.setText(m.getEmployee(currentPersonIndex).getSchedule(currentScheduleIndex).toString());
+			}
+			else{
+				scheduleField.setText("");
 			}
 		}
 		else{
+			payField.setText("");
+			payField.setEnabled(false);
 			nameField.setText(m.getCustomer(currentPersonIndex).getName());
 			lastScheduleIndex = m.getCustomer(currentPersonIndex).getScheduleLength() - 1;
-			if(currentScheduleIndex <= lastScheduleIndex){
+			if(currentScheduleIndex <= lastScheduleIndex && currentScheduleIndex != -1){
 				scheduleField.setText(m.getCustomer(currentPersonIndex).getSchedule(currentScheduleIndex).toString());
 			}
+			else{
+				scheduleField.setText("");
+			}
 		}
+	}
+	
+	private void resetToDefault() {
+		switchBetweenEmplyeesAndCustomersButton.setText("Switch to Customer View");
+		switchBetweenEmplyeesAndCustomersButton.setEnabled(true);
+		saveButton.setText("Save");
+		saveButton.setEnabled(true);
+		loadButton.setText("Load");
+		loadButton.setEnabled(true);
+		
+		addPersonButton.setText("add");
+		addPersonButton.setEnabled(true);
+		nameField.setText("");
+		nameField.setEnabled(true);
+		payField.setText("");
+		payField.setEnabled(true);
+		
+		addScheduleButton = new JButton("add");
+		previousScheduleButton = new JButton("Previous");
+		nextScheduleButton = new JButton("Next");
+		startHourField = new JFormattedTextField();
+		startMinField = new JFormattedTextField();
+		endHourField = new JFormattedTextField();
+		endMinField = new JFormattedTextField();
+		dayField = new JFormattedTextField();
+		scheduleField = new JFormattedTextField();
+		
+		
+		//switch people
+		firstPersonButton.setText("First");
+		previousPersonButton.setText("Previous");
+		nextPersonButton.setText("Next");
+		lastPersonButton.setText("Last");
 	}
 	
  	private class switchBetweenEmplyeesAndCustomersListener implements ActionListener {
 		public void actionPerformed(ActionEvent e){
 			currentScheduleIndex = 0;
-			if(onEmpoyees == true){
+			if(onEmployees == true){
 				switchBetweenEmplyeesAndCustomersButton.setText("Switch to Employee View");
-				onEmpoyees = false;
+				onEmployees = false;
 				lastPersonIndex = m.getCustomersSize() - 1;
+				
+				if(lastPersonIndex == -1){
+					addingPerson = true;
+					currentPersonIndex = -1;
+					addPerson();
+				}
+				else{
+					currentPersonIndex = 0;
+					setUpInfo();
+				}
 				if(addingPerson){
 					payField.setText("");
 					payField.setEnabled(false);
 				}
-				else{
-					if(lastPersonIndex == -1){
-						addingPerson = true;
-						currentPersonIndex = -1;
-						addPerson();
-					}
-					else{
-						currentPersonIndex = 0;
-						setUpInfo();
-					}
-				}
 			}
 			else{
 				switchBetweenEmplyeesAndCustomersButton.setText("Switch to Customer View");
-				onEmpoyees = true;
+				resetToDefault();
+				onEmployees = true;
 				lastPersonIndex = m.getEmployeesSize() - 1;
 				if(addingPerson){
 					payField.setEnabled(true);
@@ -364,6 +408,16 @@ public class GUIWindow  extends JFrame{
 						currentPersonIndex = 0;
 						setUpInfo();
 					}
+				}
+			}
+			if(onEmployees && !addingPerson){
+				if(m.getEmployee(currentPersonIndex).getScheduleLength() < 1){
+					currentScheduleIndex = -1;
+				}
+			}
+			else if(!addingPerson){
+				if(m.getCustomer(currentPersonIndex).getScheduleLength() < 1){
+					currentScheduleIndex = -1;
 				}
 			}
 		}
@@ -394,10 +448,10 @@ public class GUIWindow  extends JFrame{
 					Manager m = new Manager(chooser.getSelectedFile());
 					lastPersonIndex = m.getEmployeesSize() - 1;
 					if(lastPersonIndex == -1){
-						onEmpoyees = false;
+						onEmployees = false;
 						lastPersonIndex = m.getCustomersSize() - 1;
 						if(lastPersonIndex == -1){
-							onEmpoyees = true;
+							onEmployees = true;
 							addingPerson = true;
 							currentPersonIndex = -1;
 							addPerson();
@@ -441,8 +495,9 @@ public class GUIWindow  extends JFrame{
 	
 	private class previousScheduleListener implements ActionListener {
 		public void actionPerformed(ActionEvent e){
-			if(currentScheduleIndex > 1){
+			if(currentScheduleIndex > 0){
 				currentScheduleIndex--;
+				setUpInfo();
 			}
 		}
 	}
@@ -451,6 +506,7 @@ public class GUIWindow  extends JFrame{
 		public void actionPerformed(ActionEvent e){
 			if(currentScheduleIndex < lastScheduleIndex){
 				currentScheduleIndex++;
+				setUpInfo();
 			}
 		}
 	}
@@ -458,6 +514,8 @@ public class GUIWindow  extends JFrame{
 	private class firstPersonListener implements ActionListener {
 		public void actionPerformed(ActionEvent e){
 			currentPersonIndex = 0;
+			currentScheduleIndex = 0;
+			setUpInfo();
 		}
 	}
 	
@@ -465,6 +523,8 @@ public class GUIWindow  extends JFrame{
 		public void actionPerformed(ActionEvent e){
 			if(currentPersonIndex > 0){
 				currentPersonIndex--;
+				currentScheduleIndex = 0;
+				setUpInfo();
 			}
 		}
 	}
@@ -473,6 +533,8 @@ public class GUIWindow  extends JFrame{
 		public void actionPerformed(ActionEvent e){
 			if(currentPersonIndex < lastPersonIndex){
 				currentPersonIndex++;
+				currentScheduleIndex = 0;
+				setUpInfo();
 			}
 		}
 	}
@@ -480,6 +542,8 @@ public class GUIWindow  extends JFrame{
 	private class lastPersonListener implements ActionListener {
 		public void actionPerformed(ActionEvent e){
 			currentPersonIndex = lastPersonIndex;
+			currentScheduleIndex = 0;
+			setUpInfo();
 		}
 	}
 
