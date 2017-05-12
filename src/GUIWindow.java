@@ -1,9 +1,13 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.FileNotFoundException;
 import java.text.*;
 
@@ -147,7 +151,7 @@ public class GUIWindow  extends JFrame{
 		lastPersonButton.addActionListener(new lastPersonListener());
 		
 		nameField.addActionListener(new nameListener());
-		payField.addActionListener(new payListener());
+		payField.addPropertyChangeListener(new payListener());
 		
 		addPerson();
 	}
@@ -186,7 +190,7 @@ public class GUIWindow  extends JFrame{
 		lastPersonButton.setEnabled(false);
 		
 		nameField.removeActionListener(new nameListener());
-		payField.removeActionListener(new payListener());
+		payField.removePropertyChangeListener(new payListener());
 	}
 	
 	private void savePerson(){
@@ -218,7 +222,7 @@ public class GUIWindow  extends JFrame{
 			}
 			
 			nameField.addActionListener(new nameListener());
-			payField.addActionListener(new payListener());
+			payField.addPropertyChangeListener(new payListener());
 			
 			if(onEmployees){
 				payField.setEnabled(true);
@@ -549,13 +553,27 @@ public class GUIWindow  extends JFrame{
 
 	private class nameListener implements ActionListener {
 		public void actionPerformed(ActionEvent e){
-			
+			m.getCustomer(currentPersonIndex).changeName(nameField.getText());
 		}
 	}
 
-	private class payListener implements ActionListener {
-		public void actionPerformed(ActionEvent e){
-			
+	private class payListener implements PropertyChangeListener {
+		public void update() {
+			if(onEmployees){
+				try{
+					m.getEmployee(currentPersonIndex).changePay(Double.parseDouble(payField.getText()));
+					payField.setForeground(Color.BLACK);
+				}
+				catch(Exception ex){
+					System.out.println("ex");
+					//payField.setForeground(Color.RED);
+				}
+		    }
 		}
+		
+		public void propertyChange(PropertyChangeEvent x) {
+			update();
+		}
+		
 	}
 }

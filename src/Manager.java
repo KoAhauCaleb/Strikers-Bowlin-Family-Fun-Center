@@ -29,7 +29,7 @@ public class Manager {
 		//System.out.println(employed);
 		separatePeopleE(employed);
 		if(in.hasNextLine()){
-			separatePeopleE(in.nextLine());
+			separatePeopleC(in.nextLine());
 		}
 		
 	}
