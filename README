@@ -1,0 +1,7 @@
+1. Go to http://www.oracle.com/technetwork/pt/java/javase/downloads/jdk8-downloads-2133151.html download and install JDK.
+2. Go to http://www.eclipse.org/downloads/ and download and install eclipse.
+3. In eclipse File -> Import -> Git -> Projects From Git > Clone URI, then enter 
+  https://github.com/gtwogtwo/Strikers-Bowlin-Family-Fun-Center into URI field.
+4. Click next 4 times.
+5. In package explorer expand Strikers Bowlin' Family Fun Center -> src > (default package), double click Application.java
+6. Click the rightmost Green Triangle icon on top left of window to run application
