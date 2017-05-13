@@ -2,6 +2,7 @@
 2. Go to http://www.eclipse.org/downloads/ and download and install eclipse.
 3. In eclipse File -> Import -> Git -> Projects From Git > Clone URI, then enter 
   https://github.com/gtwogtwo/Strikers-Bowlin-Family-Fun-Center into URI field.
-4. Click next 4 times.
-5. In package explorer expand Strikers Bowlin' Family Fun Center -> src > (default package), double click Application.java
+4. Click next 3 times, make sure "Import existing Eclipse Project" is selected, press next then finish.
+5. In package explorer expand Strikers Bowlin' Family Fun Center -> src > (default package), double click Application.java, files in source
+  are all the files writen by me.
 6. Click the rightmost Green Triangle icon on top left of window to run application
